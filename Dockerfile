@@ -22,4 +22,4 @@ RUN php ./vendor/bin/rr get-binary -n && chmod +x ./rr
 EXPOSE 8080
 
 # تشغيل الـ Migrations ثم تشغيل Laravel Octane بأقصى سرعة
-CMD sh -c "php artisan migrate --force && php artisan octane:start --server=roadrunner --host=0.0.0.0 --port=${PORT:-8080} --workers=4"
+CMD sh -c "php artisan migrate --seed --force && php artisan cache:clear && php artisan octane:start --server=roadrunner --host=0.0.0.0 --port=${PORT:-8080} --workers=4"

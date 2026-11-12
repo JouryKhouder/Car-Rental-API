@@ -13,7 +13,6 @@ class MakeSeeder extends Seeder
      */
     public function run(): void
     {
-        // مصفوفة تشمل جميع الماركات الـ 10 المطلوبة مع أشهر موديلاتها الواقعية
         $carData = [
             'Toyota' => ['Camry', 'Corolla', 'Land Cruiser', 'Yaris'],
             'Mercedes-Benz' => ['C-Class', 'S-Class', 'G-Class', 'E-Class'],

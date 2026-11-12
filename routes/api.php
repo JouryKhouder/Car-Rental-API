@@ -118,9 +118,17 @@ Route::middleware('auth:sanctum')->group(function () {
 
 // 1. المسار الأول: اختبار ضغط مباشر (يفحص سرعة Octane + Redis Cache + MySQL)
 Route::get('/stress-test/public-cars', function () {
-    // يحفظ النتيجة في كاش Redis لمدة 60 ثانية ليخدم الـ 3000 طلب بسرعة البرق
+    // إذا كان جدول السيارات فارغاً، شغل السيدر لمرة واحدة فقط وتجاهل خطأ تكرار Toyota
+    if (\App\Models\Vehicle::count() === 0) {
+        try {
+            \Illuminate\Support\Facades\Artisan::call('db:seed', ['--force' => true]);
+        } catch (\Throwable $e) {
+            // إذا كان هناك VehicleSeeder منفصل، يمكن استدعاؤه أو تجاهل خطأ MakeSeeder
+        }
+    }
+
     $cars = Cache::remember('stress_test_public_cars', 60, function () {
-        return Vehicle::latest()->take(100)->get();
+        return \App\Models\Vehicle::latest()->take(20)->get();
     });
 
     return response()->json([

@@ -23,19 +23,22 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        $this->call([
-            // UserSeeder::class,
-            // CustomerSeeder::class,
+        $seeders = [
+            UserSeeder::class,
             MakeSeeder::class,
             CarCategorySeeder::class,
             FuelTypeSeeder::class,
             DriveTypeSeeder::class,
             VehicleSeeder::class,
-            // RentalBookingSeeder::class,
-            // DefaultData\VehicleReturnSeeder::class
-            // VehicleLookupsSeeder::class,
-        ]);
+        ];
+
+        foreach ($seeders as $seeder) {
+            try {
+                $this->call($seeder);
+            } catch (\Throwable $e) {
+                // إذا كان الجدول ممتلئاً مسبقاً (مثل MakeSeeder)، يتخطاه ويكمل للذي بعده!
+                continue;
+            }
+        }
     }
 }

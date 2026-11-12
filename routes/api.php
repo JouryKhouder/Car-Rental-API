@@ -118,13 +118,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
 // 1. المسار الأول: اختبار ضغط مباشر (يفحص سرعة Octane + Redis Cache + MySQL)
 Route::get('/stress-test/public-cars', function () {
-    // إذا كان جدول السيارات فارغاً، شغل السيدر لمرة واحدة فقط وتجاهل خطأ تكرار Toyota
+    // إذا كان جدول السيارات فارغاً، شغل السيدرات وامسح الكاش القديم
     if (\App\Models\Vehicle::count() === 0) {
-        try {
-            \Illuminate\Support\Facades\Artisan::call('db:seed', ['--force' => true]);
-        } catch (\Throwable $e) {
-            // إذا كان هناك VehicleSeeder منفصل، يمكن استدعاؤه أو تجاهل خطأ MakeSeeder
-        }
+        \Illuminate\Support\Facades\Artisan::call('db:seed', ['--force' => true]);
+        \Illuminate\Support\Facades\Cache::forget('stress_test_public_cars');
     }
 
     $cars = Cache::remember('stress_test_public_cars', 60, function () {
@@ -138,6 +135,7 @@ Route::get('/stress-test/public-cars', function () {
         'data'   => $cars,
     ]);
 })->withoutMiddleware(['throttle:api']);
+
 
 // 2. المسار الثاني: اختبار ضغط مع تسجيل الدخول (Sanctum Token)
 Route::middleware('auth:sanctum')->get('/stress-test/auth-cars', function (Request $request) {

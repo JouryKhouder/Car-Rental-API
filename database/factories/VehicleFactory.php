@@ -29,7 +29,7 @@ class VehicleFactory extends Factory
             'drive_type_id' => DriveType::inRandomOrder()?->first()?->id ?? 1,
             'year' => 2023,
             'kilo_meterage' => rand(10000, 90000),
-            'plate_number' => 'ABC-' . rand(1000, 9999),
+            'plate_number' => 'ABC-' . rand(100, 999) . '-' . rand(10, 99),
             'status' => 'available',
             'rental_price_per_day' => rand(30, 200),
             'color' => 'Black',

@@ -1,0 +1,10 @@
+[phases.setup]
+nixPkgs = ["php82", "php82Packages.composer", "php82Extensions.pcntl", "php82Extensions.posix", "php82Extensions.sockets", "php82Extensions.pdo_mysql", "php82Extensions.mbstring", "php82Extensions.zip", "php82Extensions.bcmath"]
+
+[phases.build]
+cmds = [
+    "composer install --optimize-autoloader --no-scripts --no-interaction"
+]
+
+[start]
+cmd = "php ./vendor/bin/rr get-binary -n && chmod +x ./rr && php artisan migrate --force && php artisan octane:start --server=roadrunner --host=0.0.0.0 --port=${PORT:-8080} --workers=8"

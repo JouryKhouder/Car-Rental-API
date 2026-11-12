@@ -17,6 +17,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Vehicle\BookingCarController;
 use App\Http\Controllers\Vehicle\RentalController;
 use App\Http\Controllers\Vehicle\VehicleImageController;
+use App\Models\Vehicle;
+use Illuminate\Support\Facades\Cache;
 
 /*
 |--------------------------------------------------------------------------
@@ -112,3 +114,33 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/vehicles/{id}/images', [VehicleImageController::class, 'store']);
     });
 });
+
+
+// 1. المسار الأول: اختبار ضغط مباشر (يفحص سرعة Octane + Redis Cache + MySQL)
+Route::get('/stress-test/public-cars', function () {
+    // يحفظ النتيجة في كاش Redis لمدة 60 ثانية ليخدم الـ 3000 طلب بسرعة البرق
+    $cars = Cache::remember('stress_test_public_cars', 60, function () {
+        return Vehicle::latest()->take(100)->get();
+    });
+
+    return response()->json([
+        'status' => 'success',
+        'engine' => 'Laravel Octane + Redis',
+        'count'  => $cars->count(),
+        'data'   => $cars,
+    ]);
+})->withoutMiddleware(['throttle:api']);
+
+// 2. المسار الثاني: اختبار ضغط مع تسجيل الدخول (Sanctum Token)
+Route::middleware('auth:sanctum')->get('/stress-test/auth-cars', function (Request $request) {
+    $cars = Cache::remember('stress_test_auth_cars', 60, function () {
+        return Vehicle::latest()->take(100)->get();
+    });
+
+    return response()->json([
+        'status'  => 'success',
+        'user_id' => $request->user()?->id,
+        'count'   => $cars->count(),
+        'data'    => $cars,
+    ]);
+})->withoutMiddleware(['throttle:api']);

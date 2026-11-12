@@ -13,6 +13,6 @@ class VehicleSeeder extends Seeder
      */
     public function run(): void
     {
-        Vehicle::factory()->count(30)->create();
+        Vehicle::factory()->count(150)->create();
     }
 }

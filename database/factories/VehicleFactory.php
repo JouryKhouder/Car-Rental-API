@@ -32,7 +32,6 @@ class VehicleFactory extends Factory
             'plate_number' => fake()->unique()->bothify('###-####'),
             'status' => fake()->randomElement(['available', 'rented', 'maintenance']),
             'rental_price_per_day' => fake()->randomFloat(2, 20, 500),
-            // النتيجة ستكون مشابهة لـ: 45.50 أو 120.99
             'color'=>fake()->colorName(),
         ];
     }
